@@ -1214,3 +1214,41 @@ pyyaml==6.0.1
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2024-12-15 | Initial design specification |
+
+## 8. Zabbix Configuration
+
+### 8.1 Host Inventory
+
+All network hosts are configured with manual inventory mode containing:
+
+| Field | Description |
+|-------|-------------|
+| type | Router |
+| vendor | FRRouting |
+| model | FRR 8.x |
+| location | DC1-Core, DC2-Core, DC1-Transport, DC2-Transport, Site-A/B/C/D |
+| contact | noc@italtel.local |
+| serialno_a | Unique serial (CORE-001, TRANS-001, ACC-001, etc.) |
+
+### 8.2 Service Tree
+
+```
+Network Infrastructure (root)
+├── Core Layer
+│   ├── core-1 (172.30.0.11)
+│   ├── core-2 (172.30.0.12)
+│   └── core-3 (172.30.0.13)
+├── Transport Layer
+│   ├── transport-1 (172.30.0.21)
+│   ├── transport-2 (172.30.0.22)
+│   ├── transport-3 (172.30.0.23)
+│   ├── transport-4 (172.30.0.24)
+│   └── transport-5 (172.30.0.25)
+└── Access Layer
+    ├── access-1 (172.30.0.31)
+    ├── access-2 (172.30.0.32)
+    ├── access-3 (172.30.0.33)
+    └── access-4 (172.30.0.34)
+```
+
+Services are linked to ICMP triggers via `scope` tags for automatic status propagation.

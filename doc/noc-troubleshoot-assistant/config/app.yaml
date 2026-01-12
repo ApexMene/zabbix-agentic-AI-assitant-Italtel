@@ -11,7 +11,7 @@ database:
   max_overflow: 20
 
 mcp_server:
-  url: "http://localhost:13002"
+  url: "${MCP_SERVER_URL}"
   timeout: 30
 
 bedrock:

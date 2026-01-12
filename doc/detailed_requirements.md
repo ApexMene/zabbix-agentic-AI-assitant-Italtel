@@ -19,14 +19,15 @@ Build an AI-powered chat assistant for network engineers to troubleshoot network
 ### 2.1 Frontend
 - **Framework**: React + TypeScript
 - **UI Library**: Material-UI (MUI) - matching existing NOC Operations Center layout
-- **State Management**: Redux Toolkit
+- **State Management**: Zustand (with localStorage persistence)
 - **Styling**: MUI theme system (dark theme, consistent with existing NOC app)
 
 ### 2.2 Backend
 - **Runtime**: Python 3.11+
 - **Framework**: FastAPI
-- **MCP Server**: FastMCP (python-zabbix-utils integration)
-- **LLM Provider**: Amazon Bedrock (Claude)
+- **MCP Server**: Flask with python-zabbix-utils integration
+- **LLM Provider**: Amazon Bedrock (Claude Haiku 4.5)
+- **Agent Framework**: Strands Agents SDK
 
 ### 2.3 Infrastructure
 - **Deployment**: Docker containers (docker-compose)

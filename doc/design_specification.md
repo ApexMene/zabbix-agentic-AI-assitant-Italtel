@@ -75,10 +75,10 @@
 
 **Technology Stack:**
 - React 18 + TypeScript
-- Zustand (state management)
+- Zustand (state management with persistence)
 - Material-UI (MUI) v5
 - Vite (build tool)
-- Node.js server (for potential SSR)
+- Node.js server (for production with API proxy)
 
 **Directory Structure:**
 ```
@@ -161,7 +161,7 @@ export const useAlarmStore = create<AlarmState>()(
 **Technology Stack:**
 - Python 3.11+
 - FastAPI
-- Strands Agents SDK
+- Strands Agents SDK (for AI agent)
 - SQLAlchemy + asyncpg
 - Pydantic v2
 

@@ -59,6 +59,24 @@ class ApiService {
       throw new Error(error.detail || 'Failed to acknowledge alarm');
     }
   }
+
+  // Chat / Investigation
+  async createInvestigation(alarmId: string, instanceId: string): Promise<{ investigation_id: string; alarm: any }> {
+    const response = await fetch(`${API_BASE}/api/chat/investigation/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alarm_id: alarmId, instance_id: instanceId }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to create investigation');
+    }
+    return response.json();
+  }
+
+  streamInvestigation(investigationId: string): EventSource {
+    return new EventSource(`${API_BASE}/api/chat/investigation/${investigationId}/stream`);
+  }
 }
 
 export const api = new ApiService();

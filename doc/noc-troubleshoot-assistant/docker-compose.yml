@@ -66,13 +66,13 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - MCP_SERVER_URL=http://host.docker.internal:13002
       - PORT=13001
-      - AWS_REGION=${AWS_REGION}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=us-east-1
+      - AWS_PROFILE=default
     volumes:
       - ./config:/app/config:ro
       - ./runbooks:/app/runbooks:ro
       - ./data:/app/data
+      - ~/.aws:/root/.aws:ro
     depends_on:
       postgres:
         condition: service_healthy

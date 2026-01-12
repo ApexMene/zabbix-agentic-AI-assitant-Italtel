@@ -27,9 +27,9 @@ class Investigation(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     
-    # Relationships
-    messages = relationship("ChatMessage", back_populates="investigation", cascade="all, delete-orphan")
-    tool_calls = relationship("ToolCall", back_populates="investigation", cascade="all, delete-orphan")
+    # Relationships - use lazy='noload' to prevent automatic loading
+    messages = relationship("ChatMessage", back_populates="investigation", cascade="all, delete-orphan", lazy='noload')
+    tool_calls = relationship("ToolCall", back_populates="investigation", cascade="all, delete-orphan", lazy='noload')
     
     # Constraints
     __table_args__ = (
@@ -40,7 +40,7 @@ class Investigation(Base):
     )
     
     def __repr__(self):
-        return f"<Investigation(id={self.id}, host={self.host_name}, status={self.status})>"
+        return f"<Investigation>"
 
 class ChatMessage(Base):
     """Chat message model."""

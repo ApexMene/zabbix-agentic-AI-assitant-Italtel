@@ -28,6 +28,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useAlarmStore } from '@/stores/alarmStore';
 import { useInstanceStore } from '@/stores/instanceStore';
+import { useChatStore } from '@/stores/chatStore';
 import { api } from '@/services/api';
 import { severityColors } from '@/theme/darkTheme';
 import { Alarm } from '@/types';
@@ -35,6 +36,7 @@ import { Alarm } from '@/types';
 export default function AlarmTable() {
   const { alarms, setAlarms, updateLastPollTime } = useAlarmStore();
   const { selectedInstanceId, setSelectedInstance, instances } = useInstanceStore();
+  const { setInvestigationId, addMessage, appendToLastMessage, setStreaming, clearChat } = useChatStore();
   const [searchText, setSearchText] = useState('');
   const [severityFilter, setSeverityFilter] = useState<string[]>([]);
 
@@ -84,6 +86,51 @@ export default function AlarmTable() {
     } catch (error) {
       console.error('Failed to acknowledge alarm:', error);
       alert('Failed to acknowledge alarm');
+    }
+  };
+
+  const handleInvestigate = async (alarm: Alarm) => {
+    try {
+      clearChat();
+      
+      const result = await api.createInvestigation(alarm.id, alarm.instance_id);
+      setInvestigationId(result.investigation_id);
+      
+      addMessage({
+        role: 'system',
+        content: `Starting investigation for: ${alarm.description}`,
+        timestamp: new Date()
+      });
+      
+      setStreaming(true);
+      addMessage({ role: 'assistant', content: '', timestamp: new Date() });
+      
+      const eventSource = api.streamInvestigation(result.investigation_id);
+      
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'content') {
+          appendToLastMessage(data.text);
+        } else if (data.type === 'done') {
+          setStreaming(false);
+          eventSource.close();
+        } else if (data.type === 'error') {
+          setStreaming(false);
+          appendToLastMessage(`\n\n**Error:** ${data.message}`);
+          eventSource.close();
+        }
+      };
+      
+      eventSource.onerror = () => {
+        setStreaming(false);
+        appendToLastMessage('\n\n**Error:** Connection lost');
+        eventSource.close();
+      };
+      
+    } catch (error) {
+      console.error('Failed to start investigation:', error);
+      alert('Failed to start investigation');
+      setStreaming(false);
     }
   };
 
@@ -246,7 +293,14 @@ export default function AlarmTable() {
                   <TableCell align="center">
                     <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
                       <Tooltip title="Investigate with AI">
-                        <IconButton size="small" color="primary">
+                        <IconButton 
+                          size="small" 
+                          color="primary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleInvestigate(alarm);
+                          }}
+                        >
                           <Search fontSize="small" />
                         </IconButton>
                       </Tooltip>

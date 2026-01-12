@@ -87,12 +87,13 @@ app.add_middleware(
 )
 
 # Import routes
-from api.routes import instances, alarms, health
+from api.routes import instances, alarms, health, chat
 
 # Register routes
 app.include_router(health.router, tags=["health"])
 app.include_router(instances.router, prefix="/api/instances", tags=["instances"])
 app.include_router(alarms.router, prefix="/api/alarms", tags=["alarms"])
+app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 
 @app.get("/")
 async def root():

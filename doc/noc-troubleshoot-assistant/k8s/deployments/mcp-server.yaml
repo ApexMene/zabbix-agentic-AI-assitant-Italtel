@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-server
+  namespace: noc-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mcp-server
+  template:
+    metadata:
+      labels:
+        app: mcp-server
+    spec:
+      containers:
+      - name: mcp-server
+        image: 122255437982.dkr.ecr.us-west-2.amazonaws.com/noc-mcp-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 13002
+          name: http
+        env:
+        - name: PORT
+          value: "13002"
+        - name: ZABBIX_BACKBONE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: zabbix-backbone-password
+              key: password
+        - name: ZABBIX_5GCORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: zabbix-5gcore-password
+              key: password
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 13002
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 13002
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: config
+        configMap:
+          name: instances-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-server-service
+  namespace: noc-app
+spec:
+  selector:
+    app: mcp-server
+  ports:
+  - port: 13002
+    targetPort: 13002
+  type: ClusterIP

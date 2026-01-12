@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: instances-config
+  namespace: noc-app
+data:
+  instances.yaml: |
+    instances:
+      - id: "zabbix-backbone"
+        name: "Network Backbone"
+        url: "http://zabbix-backbone-web:8080/api_jsonrpc.php"
+        username: "Admin"
+        password: "${ZABBIX_BACKBONE_PASSWORD}"
+        timeout: 30
+        enabled: true
+        description: "Monitors FRRouting network devices"
+        
+      - id: "zabbix-5gcore"
+        name: "5G Core Network"
+        url: "http://zabbix-5gcore-web:8080/api_jsonrpc.php"
+        username: "Admin"
+        password: "${ZABBIX_5GCORE_PASSWORD}"
+        timeout: 30
+        enabled: true
+        description: "Monitors Open5GS Network Functions"

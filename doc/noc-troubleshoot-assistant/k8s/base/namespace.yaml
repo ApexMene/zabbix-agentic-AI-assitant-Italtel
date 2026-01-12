@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: noc-app
+  labels:
+    name: noc-app
+    app: network-troubleshooting

@@ -1,0 +1,154 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zabbix-5gcore-postgres
+  namespace: noc-app
+spec:
+  serviceName: zabbix-5gcore-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zabbix-5gcore-postgres
+  template:
+    metadata:
+      labels:
+        app: zabbix-5gcore-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: zabbix
+        - name: POSTGRES_PASSWORD
+          value: zabbix
+        - name: POSTGRES_DB
+          value: zabbix
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+      volumes:
+      - name: data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zabbix-5gcore-postgres
+  namespace: noc-app
+spec:
+  selector:
+    app: zabbix-5gcore-postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+  clusterIP: None
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zabbix-5gcore-server
+  namespace: noc-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zabbix-5gcore-server
+  template:
+    metadata:
+      labels:
+        app: zabbix-5gcore-server
+    spec:
+      containers:
+      - name: zabbix-server
+        image: zabbix/zabbix-server-pgsql:alpine-7.0-latest
+        ports:
+        - containerPort: 10051
+        env:
+        - name: DB_SERVER_HOST
+          value: zabbix-5gcore-postgres
+        - name: POSTGRES_USER
+          value: zabbix
+        - name: POSTGRES_PASSWORD
+          value: zabbix
+        - name: POSTGRES_DB
+          value: zabbix
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zabbix-5gcore-server
+  namespace: noc-app
+spec:
+  selector:
+    app: zabbix-5gcore-server
+  ports:
+  - port: 10051
+    targetPort: 10051
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zabbix-5gcore-web
+  namespace: noc-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zabbix-5gcore-web
+  template:
+    metadata:
+      labels:
+        app: zabbix-5gcore-web
+    spec:
+      containers:
+      - name: zabbix-web
+        image: zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ZBX_SERVER_HOST
+          value: zabbix-5gcore-server
+        - name: DB_SERVER_HOST
+          value: zabbix-5gcore-postgres
+        - name: POSTGRES_USER
+          value: zabbix
+        - name: POSTGRES_PASSWORD
+          value: zabbix
+        - name: POSTGRES_DB
+          value: zabbix
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zabbix-5gcore-web
+  namespace: noc-app
+spec:
+  selector:
+    app: zabbix-5gcore-web
+  ports:
+  - port: 8080
+    targetPort: 8080

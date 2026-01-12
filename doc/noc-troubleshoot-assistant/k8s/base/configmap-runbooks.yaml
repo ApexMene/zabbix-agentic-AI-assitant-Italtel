@@ -1,0 +1,86 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runbooks-config
+  namespace: noc-app
+data:
+  zabbix-agent-unavailable.md: |
+    # Zabbix Agent Not Available
+    
+    ## Problem
+    Zabbix agent on monitored host is not responding.
+    
+    ## Root Causes
+    1. Agent service stopped
+    2. Network connectivity issue
+    3. Firewall blocking port 10050
+    4. Host unreachable
+    
+    ## Resolution
+    ```bash
+    # Check agent status
+    systemctl status zabbix-agent
+    
+    # Restart if needed
+    systemctl restart zabbix-agent
+    
+    # Verify connectivity
+    nc -zv <host_ip> 10050
+    ```
+    
+    ## Escalation
+    If host unreachable or multiple hosts affected, escalate to Network Operations.
+  
+  high-cpu-usage.md: |
+    # High CPU Usage
+    
+    ## Problem
+    Network device experiencing high CPU utilization.
+    
+    ## Root Causes
+    1. Traffic spike
+    2. Routing protocol convergence
+    3. Control plane attack
+    4. Software bug
+    
+    ## Resolution
+    ```bash
+    # Check CPU usage
+    vtysh -c "show processes cpu"
+    
+    # Identify top processes
+    vtysh -c "show thread cpu"
+    
+    # Check interface rates
+    vtysh -c "show interface"
+    ```
+    
+    ## Escalation
+    If CPU > 90% for 10+ minutes, escalate to Senior Network Engineer.
+  
+  interface-down.md: |
+    # Interface Down
+    
+    ## Problem
+    Network interface has gone down.
+    
+    ## Root Causes
+    1. Cable unplugged
+    2. Transceiver failure
+    3. Interface shutdown
+    4. Peer device down
+    
+    ## Resolution
+    ```bash
+    # Check interface status
+    vtysh -c "show interface <name>"
+    
+    # Bring up if shutdown
+    vtysh
+    configure terminal
+    interface <name>
+      no shutdown
+    ```
+    
+    ## Escalation
+    If core/backbone link, escalate immediately.

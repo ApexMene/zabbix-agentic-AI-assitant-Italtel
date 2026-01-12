@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: noc-app
+data:
+  app.yaml: |
+    server:
+      host: "0.0.0.0"
+      port: 13001
+
+    polling:
+      interval_seconds: 30
+
+    database:
+      url: "postgresql://noc_user:noc_password@postgres-service:5432/noc_db"
+      pool_size: 10
+      max_overflow: 20
+
+    mcp_server:
+      url: "http://mcp-server-service:13002"
+      timeout: 30
+
+    bedrock:
+      region: "us-east-1"
+      model_id: "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+      temperature: 0.3
+      max_tokens: 4096
+
+    history:
+      retention_days: 90
+
+    runbooks:
+      path: "./runbooks"
+
+    logging:
+      level: "INFO"
+      format: "json"

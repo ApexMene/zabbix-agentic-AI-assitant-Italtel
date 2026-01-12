@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: noc-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      serviceAccountName: noc-backend
+      containers:
+      - name: backend
+        image: 122255437982.dkr.ecr.us-west-2.amazonaws.com/noc-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 13001
+          name: http
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://noc_user:noc_password@postgres-service:5432/noc_db"
+        - name: MCP_SERVER_URL
+          value: "http://mcp-server-service:13002"
+        - name: PORT
+          value: "13001"
+        - name: AWS_REGION
+          value: "us-east-1"
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+        - name: runbooks
+          mountPath: /app/runbooks
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 13001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 13001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      volumes:
+      - name: config
+        configMap:
+          name: app-config
+      - name: runbooks
+        configMap:
+          name: runbooks-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: noc-app
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 13001
+    targetPort: 13001
+  type: ClusterIP

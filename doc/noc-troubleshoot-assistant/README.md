@@ -24,7 +24,8 @@ docker-compose up -d
 ```
 
 3. **Access applications:**
-- Frontend: http://localhost:13000
+- **Frontend UI: http://localhost:13000** ⭐
+  - If you see a white screen, do a hard refresh: `Cmd+Shift+R` (Mac) or `Ctrl+Shift+R` (Windows)
 - Backend API: http://localhost:13001
 - MCP Server: http://localhost:13002
 - pgAdmin: http://localhost:13050 (admin@local.dev / admin)

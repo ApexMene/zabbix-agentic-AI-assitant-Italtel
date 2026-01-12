@@ -1,0 +1,18 @@
+instances:
+  - id: "zabbix-backbone"
+    name: "Network Backbone"
+    url: "http://host.docker.internal:13080/api_jsonrpc.php"
+    username: "Admin"
+    password: "${ZABBIX_BACKBONE_PASSWORD}"
+    timeout: 30
+    enabled: true
+    description: "Monitors FRRouting network devices (Core/Transport/Access layers)"
+    
+  - id: "zabbix-5gcore"
+    name: "5G Core Network"
+    url: "http://host.docker.internal:13081/api_jsonrpc.php"
+    username: "Admin"
+    password: "${ZABBIX_5GCORE_PASSWORD}"
+    timeout: 30
+    enabled: true
+    description: "Monitors Open5GS Network Functions (AMF, SMF, UPF, etc.)"

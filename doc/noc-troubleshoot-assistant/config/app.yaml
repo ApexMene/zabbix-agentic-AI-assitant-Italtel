@@ -1,0 +1,31 @@
+server:
+  host: "0.0.0.0"
+  port: 13001
+
+polling:
+  interval_seconds: 30
+
+database:
+  url: "${DATABASE_URL}"
+  pool_size: 10
+  max_overflow: 20
+
+mcp_server:
+  url: "http://localhost:13002"
+  timeout: 30
+
+bedrock:
+  region: "us-east-1"
+  model_id: "anthropic.claude-3-sonnet-20240229-v1:0"
+  temperature: 0.3
+  max_tokens: 4096
+
+history:
+  retention_days: 90
+
+runbooks:
+  path: "./runbooks"
+
+logging:
+  level: "INFO"
+  format: "json"
